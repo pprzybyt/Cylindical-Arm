@@ -84,7 +84,7 @@ public class Task extends TimerTask {
         }
         
         //  CollisionDetector.inCollision 
-        if(przyciski[6] && !isCatched && !fallingDown)
+        if(przyciski[6] && !isCatched && !isFallingDown)
         {
            isCatched = true;
            
@@ -118,13 +118,13 @@ public class Task extends TimerTask {
             
             prymHeight = robotHeight/2 + pierscien.getYPos()+ 0.01f;
             prymXPos = ramie.getXPos()+ ramie.getHeight()/2 + prymityw.getRadius();
-            fallingDown = true;
+            isFallingDown = true;
             
             
             
         }
         
-        if(fallingDown)
+        if(isFallingDown)
         {
              if(prymHeight >= groundHeight/2 + prymityw.getRadius() + 0.03f)
              {
@@ -140,7 +140,7 @@ public class Task extends TimerTask {
              }
              else {
 
-                 fallingDown = false;
+                 isFallingDown = false;
              }
         }
         

@@ -79,7 +79,7 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
     public static double prymLastAngle;
     public static float prymHeight;
     public static float prymXPos;
-    public static boolean fallingDown = false;
+    public static boolean isFallingDown = false;
     
     public static BranchGroup prym;
     
