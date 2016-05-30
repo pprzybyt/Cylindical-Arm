@@ -1,0 +1,398 @@
+
+package robot2;
+
+import com.sun.j3d.utils.behaviors.mouse.MouseRotate;
+import com.sun.j3d.utils.geometry.Cylinder;
+import com.sun.j3d.utils.geometry.Sphere;
+import com.sun.j3d.utils.image.TextureLoader;
+import com.sun.j3d.utils.universe.SimpleUniverse;
+import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Timer;
+import javax.media.j3d.AmbientLight;
+import javax.media.j3d.Appearance;
+import javax.media.j3d.BoundingSphere;
+import javax.media.j3d.BranchGroup;
+import javax.media.j3d.Canvas3D;
+import javax.media.j3d.DirectionalLight;
+import javax.media.j3d.ImageComponent2D;
+import javax.media.j3d.Material;
+import javax.media.j3d.Texture;
+import javax.media.j3d.Texture2D;
+import javax.media.j3d.Transform3D;
+import javax.media.j3d.TransformGroup;
+import javax.swing.JFrame;
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Color3f;
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Point3d;
+import javax.vecmath.Vector3f;
+
+/**
+ *
+ * @author przem0
+ */
+
+public class Robot2 extends JFrame implements ActionListener, KeyListener{
+
+    
+    private BranchGroup scena;
+    public static TransformGroup objRotate;
+    
+    // up, down, left, roght, long, short, take, put
+    public static boolean [] przyciski = new boolean[8];
+    
+    private Cylinder podloga;
+    private Cylinder trzon;
+    public static MyCylinder pierscien;
+    public static MyCylinder ramie;
+    public static MyCylinder kisc;
+    
+    public static MySphere prymityw;
+    
+    public static float robotHeight = 0.8f;
+    public static float robotRadius = 0.2f;
+    public static float groundHeight = 0.02f;
+    
+    public static Transform3D transPierscien;
+    public static Transform3D rotPierscien;
+    
+    public static TransformGroup przesunPierscien;
+    public static TransformGroup obrotPierscien;
+    
+    public static TransformGroup przesunRamie;
+    public static Transform3D transRamie;
+    
+    public static TransformGroup przesunKisc;
+    
+    public static TransformGroup przesunPrym;
+    public static TransformGroup obrotPrym;
+    
+    public static Transform3D rotPrym;
+    public static Transform3D transPrym;
+    
+    public static boolean isCatched = false;
+    public static double prymLastAngle;
+    public static float prymHeight;
+    public static float prymXPos;
+    public static boolean fallingDown = false;
+    
+    public static BranchGroup prym;
+    
+    
+    private Timer timer;
+    
+    public Robot2()
+    {
+        super("Robot 3D");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+    
+        this.addKeyListener(this);
+        
+        
+        GraphicsConfiguration config =
+        SimpleUniverse.getPreferredConfiguration();
+
+        Canvas3D canvas3D = new Canvas3D(config);
+        canvas3D.setPreferredSize(new Dimension(800,600));
+        canvas3D.addKeyListener(this);
+
+        add(canvas3D);
+        pack();
+        setVisible(true);
+        setFocusable(true);
+        setLocationRelativeTo(null);
+        requestFocusInWindow();
+
+        scena = utworzScene();
+        
+	scena.compile();
+
+        SimpleUniverse simpleU = new SimpleUniverse(canvas3D);
+
+        Transform3D przesuniecie_obserwatora = new Transform3D();
+        przesuniecie_obserwatora.set(new Vector3f(0.0f,(robotHeight+groundHeight)/2,3.0f));
+        
+
+        simpleU.getViewingPlatform().getViewPlatformTransform().setTransform(przesuniecie_obserwatora);
+        simpleU.addBranchGraph(scena);
+        
+        // 40 razy na sekunde wykonuje to co w klasie zadanie
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new Task(),0,25);
+        
+    }
+
+    public static void main(String[] args) {
+        
+        Robot2 robo = new Robot2();
+ 
+    }
+
+    
+     private BranchGroup utworzScene() 
+     {
+            BranchGroup Scena = new BranchGroup();
+            
+            BoundingSphere bounds = new BoundingSphere();
+            
+            Lights(Scena,bounds);
+            
+           
+        // PODŁOGA
+         
+      Appearance aPodloga = new Appearance();
+      Material mPodloga = new Material();
+      
+      Texture2D tPodloga = TextureMaker("pafcy.jpg");
+      
+      aPodloga.setMaterial(mPodloga);
+      aPodloga.setTexture(tPodloga);
+      
+      podloga = new Cylinder(1.0f, groundHeight,Cylinder.GENERATE_NORMALS | Cylinder.GENERATE_TEXTURE_COORDS,aPodloga);
+      
+      TransformGroup glownaTrans = new TransformGroup();
+      AllowBlock(glownaTrans, true);
+      glownaTrans.addChild(podloga);
+      
+      //   TRZON
+      
+      Appearance aRobot = new Appearance();
+      Material mRobot = new Material();
+      
+      Texture2D tRobot = TextureMaker("robot.jpg");
+      
+      aRobot.setMaterial(mRobot);
+      aRobot.setTexture(tRobot);
+      
+      trzon = new Cylinder(robotRadius, robotHeight,Cylinder.GENERATE_NORMALS | Cylinder.GENERATE_TEXTURE_COORDS,aRobot);
+      
+      Transform3D transTrzon = new Transform3D();
+      transTrzon.set(new Vector3f(0.0f,(robotHeight+groundHeight)/2,0.0f));
+      
+      TransformGroup przesunTrzon = new TransformGroup(transTrzon);
+      przesunTrzon.addChild(trzon);
+      
+      glownaTrans.addChild(przesunTrzon);
+     
+    //   PIERSCIEN
+    
+      pierscien = new MyCylinder(0.24f, 0.2f,Cylinder.GENERATE_NORMALS | Cylinder.GENERATE_TEXTURE_COORDS,aRobot);
+      
+      transPierscien = new Transform3D();
+      przesunPierscien = new TransformGroup(transPierscien);
+         AllowBlock(przesunPierscien, true);
+      przesunPierscien.addChild(pierscien);
+      
+      
+      rotPierscien = new Transform3D();
+      obrotPierscien = new TransformGroup(rotPierscien);
+         AllowBlock(obrotPierscien, true);
+      obrotPierscien.addChild(przesunPierscien);
+      
+      przesunTrzon.addChild(obrotPierscien);
+      
+      //  RAMIE
+      
+      ramie = new MyCylinder(0.07f, 0.5f,Cylinder.GENERATE_NORMALS | Cylinder.GENERATE_TEXTURE_COORDS,aRobot);
+      
+      Transform3D tempRot = new Transform3D();
+      tempRot.rotZ((double)Math.PI/2);
+      
+      Transform3D poczRot = new Transform3D();
+      poczRot.mul(tempRot);
+      
+      TransformGroup obrotPocz = new TransformGroup(poczRot);
+      obrotPocz.addChild(ramie);
+      
+      transRamie = new Transform3D();
+      transRamie.set(new Vector3f(robotRadius,0.0f,0.0f));
+      
+      ramie.setXPos(robotRadius);
+      
+      przesunRamie = new TransformGroup(transRamie);
+         AllowBlock(przesunRamie, true);
+      przesunRamie.addChild(obrotPocz);
+      
+      przesunPierscien.addChild(przesunRamie);
+      
+      //   KISC
+      
+      kisc = new MyCylinder(0.1f, 0.01f,Cylinder.GENERATE_NORMALS | Cylinder.GENERATE_TEXTURE_COORDS,aRobot);
+        
+      TransformGroup obrotPocz2 = new TransformGroup(poczRot);
+      obrotPocz2.addChild(kisc);
+      
+      Transform3D transKisc = new Transform3D();
+      transKisc.set(new Vector3f(ramie.getHeight()/2,0.0f,0.0f));
+      
+      przesunKisc = new TransformGroup(transKisc);
+         AllowBlock(przesunKisc, true);
+      przesunKisc.addChild(obrotPocz2);
+      
+      przesunRamie.addChild(przesunKisc);
+  
+      // PRYMITYW
+      
+      Appearance aPilka = new Appearance();
+      Material mPilka = new Material();
+      
+      Texture2D tPilka = TextureMaker("pilka.jpg");
+      
+      aPilka.setMaterial(mPilka);
+      aPilka.setTexture(tPilka);
+      
+      prymityw =  new MySphere(0.1f,Sphere.GENERATE_TEXTURE_COORDS|Sphere.GENERATE_NORMALS ,aPilka);
+      
+      transPrym = new Transform3D();
+         
+      transPrym.set(new Vector3f(ramie.getHeight(),prymityw.getRadius() + groundHeight/2 + 0.01f,0.0f));
+      
+      przesunPrym = new TransformGroup(transPrym);
+           AllowBlock(przesunPrym, true);    
+      przesunPrym.addChild(prymityw);
+      
+       rotPrym = new Transform3D();
+       
+       obrotPrym = new TransformGroup(rotPrym);
+         AllowBlock(obrotPrym, true);
+       obrotPrym.addChild(przesunPrym);
+       
+       obrotPrym.setCapability(TransformGroup.ALLOW_CHILDREN_WRITE);
+       
+       prym = new BranchGroup();
+       
+       prym.setCapability(BranchGroup.ALLOW_DETACH);
+       prym.setCapability(BranchGroup.ALLOW_CHILDREN_READ);
+       prym.setCapability(BranchGroup.ALLOW_CHILDREN_WRITE);
+       
+       prym.addChild(obrotPrym);
+       
+       // kolizja
+//       CollisionDetector cd = new CollisionDetector(przesunPrym);
+//        cd.setSchedulingBounds(bounds);
+//        
+      
+      
+        //   MYSZKA 
+        objRotate = new TransformGroup();
+        objRotate.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+        objRotate.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
+         
+        objRotate.setCapability(TransformGroup.ALLOW_CHILDREN_WRITE);
+        objRotate.setCapability(TransformGroup.ALLOW_CHILDREN_READ);
+        objRotate.setCapability(TransformGroup.ALLOW_CHILDREN_EXTEND);
+
+        Scena.addChild(objRotate);
+        
+        objRotate.addChild(glownaTrans);
+        objRotate.addChild(prym);
+        
+    //    objRotate.addChild(cd);
+   
+       
+    
+
+         
+        MouseRotate myMouseRotate = new MouseRotate();
+        myMouseRotate.setTransformGroup(objRotate);
+        myMouseRotate.setSchedulingBounds(new BoundingSphere());
+        Scena.addChild(myMouseRotate);
+        
+        
+            return Scena;
+            
+     }
+     
+    private void Lights( BranchGroup bg, BoundingSphere bounds) {
+            
+      DirectionalLight lightD = new DirectionalLight();
+      lightD.setInfluencingBounds(bounds);
+      lightD.setDirection(new Vector3f(0.0f, 0.0f,-1.0f));
+      lightD.setColor(new Color3f(0.7f, 0.9f, 0.8f));
+      bg.addChild(lightD);
+      
+      AmbientLight lightA = new AmbientLight();
+      lightA.setInfluencingBounds(bounds);
+      lightA.setColor(new Color3f(0.02f,0.7f,0.5f));
+      bg.addChild(lightA);
+    }
+    
+    private void AllowBlock( TransformGroup tg , boolean allowChildren) {
+        
+        tg.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+        tg.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
+        
+        if(allowChildren)
+        {
+            tg.setCapability(TransformGroup.ALLOW_CHILDREN_EXTEND);
+            tg.setCapability(TransformGroup.ALLOW_CHILDREN_WRITE);
+            tg.setCapability(TransformGroup.ALLOW_CHILDREN_READ);
+        }            
+    }
+    
+    private Texture2D TextureMaker(String source)
+    {
+        TextureLoader loader = new TextureLoader(source,this);
+        ImageComponent2D image = loader.getImage();
+
+        Texture2D t2D = new Texture2D(Texture.BASE_LEVEL, Texture.RGBA, image.getWidth(), image.getHeight());
+
+        t2D.setImage(0, image);
+        t2D.setBoundaryModeS(Texture.WRAP);
+        t2D.setBoundaryModeT(Texture.WRAP);
+        
+        return t2D;   
+    }
+       
+    @Override
+    public void actionPerformed(ActionEvent e) 
+    {
+        
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) 
+    {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        
+        switch(e.getKeyCode())
+        {
+            case KeyEvent.VK_UP : przyciski[0] = true; break;
+            case KeyEvent.VK_DOWN : przyciski[1] = true; break;
+            case KeyEvent.VK_LEFT : przyciski[2] = true; break;
+            case KeyEvent.VK_RIGHT : przyciski[3] = true; break;
+            case KeyEvent.VK_Z : przyciski[4] = true; break;
+            case KeyEvent.VK_X : przyciski[5] = true; break;
+            case KeyEvent.VK_C : przyciski[6] = true; break;
+            case KeyEvent.VK_SPACE : przyciski[7] = true; break;
+        }
+        
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+      switch(e.getKeyCode())
+        {
+            case KeyEvent.VK_UP : przyciski[0] = false; break;
+            case KeyEvent.VK_DOWN : przyciski[1] = false; break;
+            case KeyEvent.VK_LEFT : przyciski[2] = false; break;
+            case KeyEvent.VK_RIGHT : przyciski[3] = false; break;
+            case KeyEvent.VK_Z : przyciski[4] = false; break;
+            case KeyEvent.VK_X : przyciski[5] = false; break;
+            case KeyEvent.VK_C : przyciski[6] = false; break;
+            case KeyEvent.VK_SPACE : przyciski[7] = false; break;
+        }
+    }
+
+
+}
