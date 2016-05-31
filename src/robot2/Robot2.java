@@ -2,6 +2,7 @@
 package robot2;
 
 import com.sun.j3d.utils.behaviors.mouse.MouseRotate;
+import com.sun.j3d.utils.behaviors.vp.OrbitBehavior;
 import com.sun.j3d.utils.geometry.Cylinder;
 import com.sun.j3d.utils.geometry.Sphere;
 import com.sun.j3d.utils.image.TextureLoader;
@@ -40,7 +41,7 @@ import javax.vecmath.Vector3f;
 public class Robot2 extends JFrame implements ActionListener, KeyListener{
 
     
-    private BranchGroup scena;
+    public static BranchGroup scena;
     public static TransformGroup objRotate;
     
     // up, down, left, roght, long, short, take, put
@@ -53,6 +54,8 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
     public static MyCylinder kisc;
     
     public static MySphere prymityw;
+    
+    private TransformGroup glownaTrans;
     
     public static float robotHeight = 0.8f;
     public static float robotRadius = 0.2f;
@@ -111,17 +114,30 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
 
         scena = utworzScene();
         
+        scena.setCapability(BranchGroup.ALLOW_CHILDREN_EXTEND);
+        scena.setCapability(BranchGroup.ALLOW_CHILDREN_READ);
+        scena.setCapability(BranchGroup.ALLOW_CHILDREN_WRITE);
+          
+        scena.setCapability(BranchGroup.ALLOW_COLLISION_BOUNDS_READ);
+        scena.setCapability(BranchGroup.ALLOW_COLLISION_BOUNDS_WRITE);
+  
 	scena.compile();
-
+        
         SimpleUniverse simpleU = new SimpleUniverse(canvas3D);
 
         Transform3D przesuniecie_obserwatora = new Transform3D();
         przesuniecie_obserwatora.set(new Vector3f(0.0f,(robotHeight+groundHeight)/2,3.0f));
-        
-
         simpleU.getViewingPlatform().getViewPlatformTransform().setTransform(przesuniecie_obserwatora);
         simpleU.addBranchGraph(scena);
+        // obrot kamery
         
+        
+         OrbitBehavior orbitBeh = new OrbitBehavior(canvas3D, OrbitBehavior.REVERSE_ROTATE);
+        orbitBeh.setSchedulingBounds(new BoundingSphere());
+        simpleU.getViewingPlatform().setViewPlatformBehavior(orbitBeh);
+   //     mainTransform = simpleU.getViewingPlatform().getViewPlatformTransform();
+              glownaTrans = simpleU.getViewingPlatform().getViewPlatformTransform();
+  
         // 40 razy na sekunde wykonuje to co w klasie zadanie
         timer = new Timer();
         timer.scheduleAtFixedRate(new Task(),0,25);
@@ -141,6 +157,8 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
             
             BoundingSphere bounds = new BoundingSphere();
             
+        //    mainTransform = new TransformGroup();
+            
             Lights(Scena,bounds);
             
            
@@ -156,7 +174,7 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
       
       podloga = new Cylinder(1.0f, groundHeight,Cylinder.GENERATE_NORMALS | Cylinder.GENERATE_TEXTURE_COORDS,aPodloga);
       
-      TransformGroup glownaTrans = new TransformGroup();
+      glownaTrans = new TransformGroup();
       AllowBlock(glownaTrans, true);
       glownaTrans.addChild(podloga);
       
@@ -249,6 +267,7 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
       
       prymityw =  new MySphere(0.1f,Sphere.GENERATE_TEXTURE_COORDS|Sphere.GENERATE_NORMALS ,aPilka);
       
+      
       transPrym = new Transform3D();
          
       transPrym.set(new Vector3f(ramie.getHeight(),prymityw.getRadius() + groundHeight/2 + 0.01f,0.0f));
@@ -265,6 +284,7 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
        
        obrotPrym.setCapability(TransformGroup.ALLOW_CHILDREN_WRITE);
        
+       
        prym = new BranchGroup();
        
        prym.setCapability(BranchGroup.ALLOW_DETACH);
@@ -273,36 +293,54 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
        
        prym.addChild(obrotPrym);
        
+       
+//       przesunPrym.setCapability(TransformGroup.ALLOW_COLLISION_BOUNDS_READ);
+//       przesunPrym.setCapability(TransformGroup.ALLOW_COLLISION_BOUNDS_WRITE);
+//       przesunPrym.setCapability(TransformGroup.ALLOW_COLLIDABLE_READ);
+//       przesunPrym.setCapability(TransformGroup.ALLOW_COLLIDABLE_WRITE);
+
+                                   
+
+       
        // kolizja
-//       CollisionDetector cd = new CollisionDetector(przesunPrym);
-//        cd.setSchedulingBounds(bounds);
-//        
+        CollisionDetector cd = new CollisionDetector(prymityw);
+        cd.setSchedulingBounds(bounds);
+        
       
       
         //   MYSZKA 
-        objRotate = new TransformGroup();
-        objRotate.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-        objRotate.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
-         
-        objRotate.setCapability(TransformGroup.ALLOW_CHILDREN_WRITE);
-        objRotate.setCapability(TransformGroup.ALLOW_CHILDREN_READ);
-        objRotate.setCapability(TransformGroup.ALLOW_CHILDREN_EXTEND);
-
-        Scena.addChild(objRotate);
+//        objRotate = new TransformGroup();
+//        
+//         AllowBlock(objRotate, true);
+//         
+////        objRotate.setCapability(TransformGroup.ALLOW_COLLIDABLE_READ);
+////        objRotate.setCapability(TransformGroup.ALLOW_COLLIDABLE_WRITE);
+////        objRotate.setCapability(TransformGroup.ALLOW_COLLISION_BOUNDS_READ);
+////        objRotate.setCapability(TransformGroup.ALLOW_COLLISION_BOUNDS_WRITE);
+//
+//        Scena.addChild(objRotate);
+//        
+//        objRotate.addChild(glownaTrans);
+//        objRotate.addChild(prym);
+//        
+        Scena.addChild(glownaTrans);
+        Scena.addChild(prym);
+     //   Scena.addChild(mainTransform);
         
-        objRotate.addChild(glownaTrans);
-        objRotate.addChild(prym);
-        
-    //    objRotate.addChild(cd);
+        Scena.addChild(cd);
+    //    objRotate.addChild(cd);   ???????
    
        
     
 
          
-        MouseRotate myMouseRotate = new MouseRotate();
-        myMouseRotate.setTransformGroup(objRotate);
-        myMouseRotate.setSchedulingBounds(new BoundingSphere());
-        Scena.addChild(myMouseRotate);
+//        MouseRotate myMouseRotate = new MouseRotate();
+//        myMouseRotate.setTransformGroup(objRotate);
+//        myMouseRotate.setSchedulingBounds(new BoundingSphere());
+//        myMouseRotate.setCapability(MouseRotate.ALLOW_COLLIDABLE_READ);
+//                myMouseRotate.setCapability(MouseRotate.ALLOW_COLLIDABLE_WRITE);
+
+//        Scena.addChild(myMouseRotate);
         
         
             return Scena;

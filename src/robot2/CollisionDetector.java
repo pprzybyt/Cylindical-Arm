@@ -24,13 +24,13 @@ public class CollisionDetector extends Behavior {
     public static boolean inCollision = false;
     private WakeupOnCollisionEntry wEnter;
     private WakeupOnCollisionExit wExit;
-//    Sphere prym;
-    TransformGroup prym;
-    //BranchGroup prym;
+    Sphere prym;
+   //   TransformGroup prym;
+  //  BranchGroup prym;
     
-    public CollisionDetector(TransformGroup tg) {
+    public CollisionDetector(Sphere s) {
         inCollision = false;
-        prym = tg;
+        prym = s;
         prym.setCollisionBounds(new BoundingSphere(new Point3d(), 0.1d));
     }
 

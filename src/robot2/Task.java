@@ -88,7 +88,7 @@ public class Task extends TimerTask {
         {
            isCatched = true;
            
-           objRotate.removeChild(prym);
+           scena.removeChild(prym);
             przesunKisc.addChild(prym);
            
               Transform3D tmp = new Transform3D();
@@ -107,7 +107,7 @@ public class Task extends TimerTask {
         {
             isCatched = false;
             przesunKisc.removeChild(prym);
-            objRotate.addChild(prym);
+            scena.addChild(prym);
             
             Transform3D tmp = new Transform3D();
             tmp.rotY(pierscien.getYAngle());
