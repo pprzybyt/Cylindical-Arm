@@ -421,6 +421,7 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
             przyciski[8] = false;
             index = 0 ;
             przyciski[9] = true;
+            this.requestFocus();
         }
         else if(e.getSource() == reset)
         {
