@@ -14,6 +14,7 @@ import javax.media.j3d.TransformGroup;
 import javax.media.j3d.WakeupOnCollisionEntry;
 import javax.media.j3d.WakeupOnCollisionExit;
 import javax.vecmath.Point3d;
+import static robot2.Robot2.isCatched;
 
 /**
  *
@@ -24,13 +25,13 @@ public class CollisionDetector extends Behavior {
     public static boolean inCollision = false;
     private WakeupOnCollisionEntry wEnter;
     private WakeupOnCollisionExit wExit;
-    Sphere prym;
-   //   TransformGroup prym;
-  //  BranchGroup prym;
+
+      TransformGroup prym;
+
     
-    public CollisionDetector(Sphere s) {
+    public CollisionDetector(TransformGroup tg) {
         inCollision = false;
-        prym = s;
+        prym = tg;
         prym.setCollisionBounds(new BoundingSphere(new Point3d(), 0.1d));
     }
 
@@ -43,11 +44,14 @@ public class CollisionDetector extends Behavior {
 
     @Override
     public void processStimulus(Enumeration criteria) {
-        inCollision = !inCollision;
+      
+           inCollision = !inCollision;
+       
         if (inCollision) 
         {
             System.out.println("in");
             wakeupOn(wExit);  
+          
         }
         else 
         {
@@ -55,6 +59,8 @@ public class CollisionDetector extends Behavior {
             
             wakeupOn(wEnter);
         }
+      
+  
     }
     
     
