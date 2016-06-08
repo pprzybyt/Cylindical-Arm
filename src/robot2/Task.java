@@ -271,6 +271,8 @@ public class Task extends TimerTask {
                 transPrym.set(new Vector3f(prymityw.getRadius(),0.0f,0.0f));
                 przesunPrym.setTransform(transPrym);   
             }
+            
+            isRecorded = true;
          }
              
                     for(int i = 0 ; i<8 ; i++)

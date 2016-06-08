@@ -116,6 +116,8 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
     private final JButton start, stop, reset;
     private final JPanel panel;
     
+    public static boolean isRecorded;
+    
     public Robot2()
     {
         super("Robot 3D");
@@ -197,7 +199,7 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
             BranchGroup Scena = new BranchGroup();
             
             BoundingSphere bounds = new BoundingSphere();
-            
+            bounds.setRadius(1.5);
             Lights(Scena,bounds);
             
            
@@ -413,20 +415,34 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
         if(e.getSource()==start)
         {
              przyciski[8] = true;
+
+             isRecorded = true;
+
              this.requestFocus();
+
             
         }
              else if (e.getSource() == stop)
         {
+            if(isRecorded)
+            {
             przyciski[8] = false;
             index = 0 ;
             przyciski[9] = true;
+
+            }
+
             this.requestFocus();
+
         }
         else if(e.getSource() == reset)
         {
              RobotReset();
+
+            isRecorded = false; 
+
              this.requestFocus();
+
         }
             
             
@@ -453,7 +469,7 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
             case KeyEvent.VK_C : przyciski[6] = true; break;        // lapanie
             case KeyEvent.VK_SPACE : przyciski[7] = true; break;  // puszczanie
             case KeyEvent.VK_S : przyciski[8] = true; break;   // start
-            case KeyEvent.VK_Q : przyciski[8] = false ; break;   // stop
+            case KeyEvent.VK_Q : if(isRecorded) przyciski[8] = false ; break;   // stop
             case KeyEvent.VK_W : RobotReset(); break;     // reset
         }
         
@@ -471,12 +487,13 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
             case KeyEvent.VK_X : przyciski[5] = false; break;
             case KeyEvent.VK_C : przyciski[6] = false; break; 
             case KeyEvent.VK_SPACE : przyciski[7] = false; break;  
-            case KeyEvent.VK_Q : index = 0 ; przyciski[9] = true; break;  
+            case KeyEvent.VK_Q :  index = 0 ; przyciski[9] = true; break;  
         }
     }
     
     public void RobotReset()
     {
+        isRecorded = false;
         przyciski[9] = false; 
         trajektoria.removeAll(trajektoria);
         Trajektoria.ID = 0;
