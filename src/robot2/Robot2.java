@@ -354,7 +354,7 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
        
                                 
        // kolizja
-        CollisionDetector cd = new CollisionDetector(przesunPrym);
+        CollisionDetector cd = new CollisionDetector(prymityw);
         cd.setSchedulingBounds(bounds);
         
       
