@@ -415,7 +415,11 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
         if(e.getSource()==start)
         {
              przyciski[8] = true;
+
              isRecorded = true;
+
+             this.requestFocus();
+
             
         }
              else if (e.getSource() == stop)
@@ -425,12 +429,20 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
             przyciski[8] = false;
             index = 0 ;
             przyciski[9] = true;
+
             }
+
+            this.requestFocus();
+
         }
         else if(e.getSource() == reset)
         {
              RobotReset();
+
             isRecorded = false; 
+
+             this.requestFocus();
+
         }
             
             
