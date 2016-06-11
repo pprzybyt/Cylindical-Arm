@@ -17,8 +17,8 @@ import javax.vecmath.Point3d;
 import static robot2.Robot2.isCatched;
 
 /**
- *
- * @author przem0
+ * This class detects whether robot's arm meets primitive
+ * @author PrzemyslawPrzybyt
  */
 
 public class CollisionDetector extends Behavior {
@@ -28,7 +28,10 @@ public class CollisionDetector extends Behavior {
 
       Sphere prym;
 
-    
+    /**
+     * 
+     * @param s Sphere that will be catched by robot
+     */
     public CollisionDetector(Sphere s) {
         inCollision = false;
         prym = s;
@@ -41,7 +44,11 @@ public class CollisionDetector extends Behavior {
         wExit = new WakeupOnCollisionExit(prym);
         wakeupOn(wEnter);
     }
-
+    
+    /**
+     * 
+     * @param criteria 
+     */
     @Override
     public void processStimulus(Enumeration criteria) {
       

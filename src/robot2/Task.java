@@ -10,12 +10,17 @@ import javax.vecmath.Vector3f;
 import static robot2.Robot2.*;
 
 /**
- *
- * @author przem0
+ * Allows robot to move acording active button specified
+ * in Array przyciski
+ * @author PrzemysławPrzybyt
  */
 
 public class Task extends TimerTask {
 
+    /**
+     * Every time, button from Array przyciski is active, moves appropiate part of robot 
+     * 
+     */
     @Override
     public void run() 
     {
@@ -48,6 +53,7 @@ public class Task extends TimerTask {
                 przesunPierscien.setTransform(transPierscien);
                 if(przyciski[8])  
                     trajektoria.get(index).ustawRuch(1);
+                
             }
              
              if(CollisionDetector.inCollision && !isCatched)

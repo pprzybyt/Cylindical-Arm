@@ -41,8 +41,8 @@ import javax.vecmath.Vector3f;
 import static robot2.Robot2.przyciski;
 
 /**
- *
- * @author przem0
+ * Main class, Creates main BranchGroup and initiates all components of scene
+ * @author PrzemyslawPrzybyt
  */
 
 public class Robot2 extends JFrame implements ActionListener, KeyListener{
@@ -192,8 +192,12 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
         Robot2 robo = new Robot2();
  
     }
-
     
+    /**
+     * Creates main BranchGroup with every Java3D component
+     * 
+     * @return main Branchgroup of program
+     */
      private BranchGroup utworzScene() 
      {
             BranchGroup Scena = new BranchGroup();
@@ -257,7 +261,7 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
        TransformGroup przesunPodst = new TransformGroup(transPodst);
        przesunPodst.addChild(podstawa);
        glownaTrans.addChild(przesunPodst);
-    
+       
      
     //   PIERSCIEN
     
@@ -329,7 +333,6 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
       aPilka.setTexture(tPilka);
       
       prymityw =  new MySphere(0.1f,Sphere.GENERATE_TEXTURE_COORDS|Sphere.GENERATE_NORMALS ,aPilka);
-      
       
       
       transPrym = new Transform3D();
@@ -409,6 +412,10 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
         return t2D;   
     }
        
+    /**
+     * Handles the upper buttons
+     * @param e ActionEvent
+     */
     @Override
     public void actionPerformed(ActionEvent e) 
     {
@@ -444,9 +451,6 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
              this.requestFocus();
 
         }
-            
-            
-        
     }
 
     @Override
@@ -455,6 +459,10 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
 
     }
 
+    /**
+     * Detects which button was pressed and activates this button
+     * @param e KeyEvent
+     */
     @Override
     public void keyPressed(KeyEvent e) {
         
@@ -475,6 +483,10 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
         
     }
 
+    /**
+     * Detects which button was released and deactivates this button
+     * @param e KeyEvent
+     */
     @Override
     public void keyReleased(KeyEvent e) {
       switch(e.getKeyCode())
@@ -490,6 +502,10 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
             case KeyEvent.VK_Q :  index = 0 ; przyciski[9] = true; break;  
         }
     }
+    
+    /**
+     * Resets recorded trajectory and allows to regain control over the robot
+     */
     
     public void RobotReset()
     {

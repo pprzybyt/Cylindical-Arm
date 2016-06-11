@@ -4,8 +4,8 @@ package robot2;
 import static robot2.Robot2.*;
 
 /**
- *
- * @author przem0
+ * Trajectory that Robot will follow automatically
+ * @author PrzemysławPrzybyt
  */
 public class Trajektoria {
     
@@ -19,7 +19,9 @@ public class Trajektoria {
     public float prymZ;
     
     public boolean catched;
-    
+    /**
+     * Creates new trajectory that Robot will follow automatically
+     */
     public Trajektoria()
     {
         this.przyciski = new boolean[8];
@@ -35,7 +37,10 @@ public class Trajektoria {
         } 
 
     }
-    
+    /**
+     * Chooses which part of robot must be moved to follow specified trajectory
+     * @param x this parameter specifies which "virtual" button must be clicked to create desired move of robot
+     */
     public void ustawRuch(int x)
     {
         if(x<8)
