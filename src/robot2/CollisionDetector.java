@@ -26,7 +26,7 @@ public class CollisionDetector extends Behavior {
     private WakeupOnCollisionEntry wEnter;
     private WakeupOnCollisionExit wExit;
 
-      Sphere prym;
+      Sphere primitive;
 
     /**
      * 
@@ -34,14 +34,14 @@ public class CollisionDetector extends Behavior {
      */
     public CollisionDetector(Sphere s) {
         inCollision = false;
-        prym = s;
-        prym.setCollisionBounds(new BoundingSphere(new Point3d(), 0.1d));
+        primitive = s;
+        primitive.setCollisionBounds(new BoundingSphere(new Point3d(), 0.1d));
     }
 
     @Override
     public void initialize() {
-        wEnter = new WakeupOnCollisionEntry(prym);
-        wExit = new WakeupOnCollisionExit(prym);
+        wEnter = new WakeupOnCollisionEntry(primitive);
+        wExit = new WakeupOnCollisionExit(primitive);
         wakeupOn(wEnter);
     }
     

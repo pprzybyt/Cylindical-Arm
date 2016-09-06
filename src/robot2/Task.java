@@ -11,48 +11,47 @@ import static robot2.Robot2.*;
 
 /**
  * Allows robot to move acording active button specified
- * in Array przyciski
+ * in Array buttons
  * @author PrzemysławPrzybyt
  */
 
 public class Task extends TimerTask {
 
     /**
-     * Every time, button from Array przyciski is active, moves appropiate part of robot 
+     * Every time, button from Array buttons is active, moves appropiate part of robot 
      * 
      */
     @Override
     public void run() 
     {
-         if(przyciski[8])
+         if(button[8])
         {
-            trajektoria.add(new Trajektoria()); 
+            trajectory.add(new Trajectory()); 
         }
          
-         if(przyciski[9])
-             UstawPozycje();
+         if(button[9])
+             SetPosition();
             
-        // Tu beda animacje nawet 3 na raz
-        if(przyciski[0])
+        if(button[0])
         {
-            if(pierscien.getYPos()<=robotHeight/2 - pierscien.getHeight()-0.02f)
+            if(ring.getYPos()<=robotHeight/2 - ring.getHeight()-0.02f)
             {   
-                pierscien.setYPos(pierscien.getYPos()+0.01f);
-                transPierscien.set(new Vector3f(pierscien.getXPos(),pierscien.getYPos(),0.0f));
-                przesunPierscien.setTransform(transPierscien);
-                if(przyciski[8])  
-                    trajektoria.get(index).ustawRuch(0);
+                ring.setYPos(ring.getYPos()+0.01f);
+                transRing.set(new Vector3f(ring.getXPos(),ring.getYPos(),0.0f));
+                translateRing.setTransform(transRing);
+                if(button[8])  
+                    trajectory.get(index).SetMovement(0);
             }    
         }
-        if(przyciski[1])
+        if(button[1])
         {
-             if(allowMoveDown && pierscien.getYPos()>= -robotHeight/2 + pierscien.getHeight()+ groundHeight +0.01f)
+             if(allowMoveDown && ring.getYPos()>= -robotHeight/2 + ring.getHeight()+ floorHeight +0.01f)
             {   
-                pierscien.setYPos(pierscien.getYPos()-0.01f);
-                transPierscien.set(new Vector3f(pierscien.getXPos(),pierscien.getYPos(),0.0f));
-                przesunPierscien.setTransform(transPierscien);
-                if(przyciski[8])  
-                    trajektoria.get(index).ustawRuch(1);
+                ring.setYPos(ring.getYPos()-0.01f);
+                transRing.set(new Vector3f(ring.getXPos(),ring.getYPos(),0.0f));
+                translateRing.setTransform(transRing);
+                if(button[8])  
+                    trajectory.get(index).SetMovement(1);
                 
             }
              
@@ -63,7 +62,7 @@ public class Task extends TimerTask {
             
         }
        
-        if(przyciski[2] && pierscien.getYAngle() <= (double)Math.PI)
+        if(button[2] && ring.getYAngle() <= (double)Math.PI)
         {
        
             if(allowMoveLeft)
@@ -72,12 +71,12 @@ public class Task extends TimerTask {
             
             rot.rotY(0.03);
             
-            pierscien.setYAngle(pierscien.getYAngle()+0.03);
+            ring.setYAngle(ring.getYAngle()+0.03);
             
-            rotPierscien.mul(rot);
-            obrotPierscien.setTransform(rotPierscien);
-            if(przyciski[8])  
-                trajektoria.get(index).ustawRuch(2);
+            rotRing.mul(rot);
+            rotateRing.setTransform(rotRing);
+            if(button[8])  
+                trajectory.get(index).SetMovement(2);
             }
        
                  if(CollisionDetector.inCollision && allowMoveRight && !isCatched)
@@ -88,7 +87,7 @@ public class Task extends TimerTask {
             
         }
        
-             if(przyciski[3] && pierscien.getYAngle() >= -(double)Math.PI)
+             if(button[3] && ring.getYAngle() >= -(double)Math.PI)
         {
             
          
@@ -97,12 +96,12 @@ public class Task extends TimerTask {
             Transform3D rot = new Transform3D();
             rot.rotY(-0.03);
             
-            pierscien.setYAngle(pierscien.getYAngle()-0.03);
+            ring.setYAngle(ring.getYAngle()-0.03);
             
-            rotPierscien.mul(rot);
-            obrotPierscien.setTransform(rotPierscien);
-            if(przyciski[8])  
-                trajektoria.get(index).ustawRuch(3);
+            rotRing.mul(rot);
+            rotateRing.setTransform(rotRing);
+            if(button[8])  
+                trajectory.get(index).SetMovement(3);
             }
             
             if(CollisionDetector.inCollision && allowMoveLeft && !isCatched)
@@ -113,15 +112,15 @@ public class Task extends TimerTask {
             
         }
         
-        if(przyciski[4])
+        if(button[4])
         {
-           if(allowMoveBack && ramie.getXPos() >= pierscien.getXPos())
+           if(allowMoveBack && arm.getXPos() >= ring.getXPos())
            {
-               ramie.setXPos(ramie.getXPos() - 0.01f);
-               transRamie.set(new Vector3f(ramie.getXPos(),0.0f,0.0f));
-               przesunRamie.setTransform(transRamie);
-               if(przyciski[8])  
-                    trajektoria.get(index).ustawRuch(4);
+               arm.setXPos(arm.getXPos() - 0.01f);
+               transArm.set(new Vector3f(arm.getXPos(),0.0f,0.0f));
+               translateArm.setTransform(transArm);
+               if(button[8])  
+                    trajectory.get(index).SetMovement(4);
            }
            
            if(CollisionDetector.inCollision && allowMoveThrough && !isCatched)
@@ -130,22 +129,22 @@ public class Task extends TimerTask {
                allowMoveBack = true;
            
         }
-        if(przyciski[5])
+        if(button[5])
         {
      
-           if(ramie.getXPos() <= pierscien.getXPos() + ramie.getHeight()/2 + 0.12f)
+           if(arm.getXPos() <= ring.getXPos() + arm.getHeight()/2 + 0.12f)
            {
                if(allowMoveThrough)
                {
-               ramie.setXPos(ramie.getXPos() + 0.01f);
-               transRamie.set(new Vector3f(ramie.getXPos(),0.0f,0.0f));
-               przesunRamie.setTransform(transRamie);
-                 if(przyciski[8])  
-                    trajektoria.get(index).ustawRuch(5);
+               arm.setXPos(arm.getXPos() + 0.01f);
+               transArm.set(new Vector3f(arm.getXPos(),0.0f,0.0f));
+               translateArm.setTransform(transArm);
+                 if(button[8])  
+                    trajectory.get(index).SetMovement(5);
                }
                
            }
-            if(CollisionDetector.inCollision && !isCatched && prymRadius>= ramie.getXPos()+ramie.getHeight()/2  )
+            if(CollisionDetector.inCollision && !isCatched && primitiveRadius>= arm.getXPos()+arm.getHeight()/2  )
                {
                    allowCatch =true;
                    allowMoveThrough = false;
@@ -158,54 +157,54 @@ public class Task extends TimerTask {
             
         }
         
-        if(przyciski[6] && allowCatch &&!isCatched && !isFallingDown)
+        if(button[6] && allowCatch &&!isCatched && !isFallingDown)
         {
            isCatched = true;
            System.err.println("catched");
            
-           scena .removeChild(prym);
-            przesunKisc.addChild(prym);
+           stage .removeChild(primitiveBranch);
+            translateWrist.addChild(primitiveBranch);
                     
-           transPrym.set(new Vector3f(prymityw.getRadius(),0.0f,0.0f));
-           przesunPrym.setTransform(transPrym);
+           transPrimitive.set(new Vector3f(primitive.getRadius(),0.0f,0.0f));
+           translatePrimitive.setTransform(transPrimitive);
            
-             if(przyciski[8])  
-                    trajektoria.get(index).ustawRuch(6);
+             if(button[8])  
+                    trajectory.get(index).SetMovement(6);
           
              
         }
       
-        if(przyciski[7] && isCatched)
+        if(button[7] && isCatched)
         {
             isCatched = false;
-            przesunKisc.removeChild(prym);
-            scena.addChild(prym);
+            translateWrist.removeChild(primitiveBranch);
+            stage.addChild(primitiveBranch);
                        
-            prymHeight = robotHeight/2 + pierscien.getYPos()+ 0.01f;
-            prymXPos = (ramie.getXPos()+  pierscien.getLenght()/2 + ramie.getHeight()/2 + prymityw.getRadius()+kisc.getHeight())*(float)Math.cos(-pierscien.getYAngle());
-            prymZPos = (ramie.getXPos()+ pierscien.getLenght()/2 + ramie.getHeight()/2 + prymityw.getRadius()+ kisc.getHeight())*(float)Math.sin(-pierscien.getYAngle());
+            primitiveHeight = robotHeight/2 + ring.getYPos()+ 0.01f;
+            primitiveXPos = (arm.getXPos()+  ring.getLenght()/2 + arm.getHeight()/2 + primitive.getRadius()+wrist.getHeight())*(float)Math.cos(-ring.getYAngle());
+            primitiveZPos = (arm.getXPos()+ ring.getLenght()/2 + arm.getHeight()/2 + primitive.getRadius()+ wrist.getHeight())*(float)Math.sin(-ring.getYAngle());
            
-            prymRadius = ramie.getXPos()+ pierscien.getLenght()/2 + ramie.getHeight()/2 + prymityw.getRadius()+kisc.getHeight();
+            primitiveRadius = arm.getXPos()+ ring.getLenght()/2 + arm.getHeight()/2 + primitive.getRadius()+wrist.getHeight();
             isFallingDown = true;
-              if(przyciski[8])  
-                    trajektoria.get(index).ustawRuch(7);
+              if(button[8])  
+                    trajectory.get(index).SetMovement(7);
             
             
         }
         
         if(isFallingDown)
         {
-             if(prymHeight >= groundHeight/2 + prymityw.getRadius() + 0.03f)
+             if(primitiveHeight >= floorHeight/2 + primitive.getRadius() + 0.03f)
              {
-                 prymHeight -= 0.02f;
-                 transPrym.set(new Vector3f(prymXPos,prymHeight,prymZPos));
-                 przesunPrym.setTransform(transPrym);
+                 primitiveHeight -= 0.02f;
+                 transPrimitive.set(new Vector3f(primitiveXPos,primitiveHeight,primitiveZPos));
+                 translatePrimitive.setTransform(transPrimitive);
              }
-             else if (prymHeight >= groundHeight/2 + prymityw.getRadius())
+             else if (primitiveHeight >= floorHeight/2 + primitive.getRadius())
              {
-                 transPrym.set(new Vector3f(prymXPos ,groundHeight/2 + prymityw.getRadius() + 0.01f,prymZPos ));
-                 przesunPrym.setTransform(transPrym);
-                 prymHeight = 0.0f;
+                 transPrimitive.set(new Vector3f(primitiveXPos ,floorHeight/2 + primitive.getRadius() + 0.01f,primitiveZPos ));
+                 translatePrimitive.setTransform(transPrimitive);
+                 primitiveHeight = 0.0f;
              }
              else {
 
@@ -217,11 +216,11 @@ public class Task extends TimerTask {
         if(!CollisionDetector.inCollision)
             allowCatch = false;
         
-        if(przyciski[8])
+        if(button[8])
             index++;
         
-        if(przyciski[9])
-            if(trajektoria.size() - 1 > index)
+        if(button[9])
+            if(trajectory.size() - 1 > index)
                 index++;
             else 
                index=0;
@@ -229,60 +228,60 @@ public class Task extends TimerTask {
         
     }
 
-    private void UstawPozycje() {
+    private void SetPosition() {
          if(index == 0)
              {
                  
             Transform3D rot = new Transform3D();
-            rot.rotY(trajektoria.get(0).yAngle - pierscien.getYAngle());           
-            rotPierscien.mul(rot);
-            obrotPierscien.setTransform(rotPierscien);
-            pierscien.setYAngle(trajektoria.get(0).yAngle);
+            rot.rotY(trajectory.get(0).yAngle - ring.getYAngle());           
+            rotRing.mul(rot);
+            rotateRing.setTransform(rotRing);
+            ring.setYAngle(trajectory.get(0).yAngle);
             
-            pierscien.setYPos(trajektoria.get(0).height);
-            transPierscien.set(new Vector3f(pierscien.getXPos(),pierscien.getYPos(),0.0f));
-            przesunPierscien.setTransform(transPierscien);
+            ring.setYPos(trajectory.get(0).height);
+            transRing.set(new Vector3f(ring.getXPos(),ring.getYPos(),0.0f));
+            translateRing.setTransform(transRing);
             
-            ramie.setXPos(trajektoria.get(0).armRadius);
-            transRamie.set(new Vector3f(ramie.getXPos(),0.0f,0.0f));
-            przesunRamie.setTransform(transRamie);
+            arm.setXPos(trajectory.get(0).armRadius);
+            transArm.set(new Vector3f(arm.getXPos(),0.0f,0.0f));
+            translateArm.setTransform(transArm);
             
             
-            transPrym.set(new Vector3f(trajektoria.get(0).prymX ,groundHeight/2 + prymityw.getRadius() + 0.01f,trajektoria.get(0).prymZ ));
-            przesunPrym.setTransform(transPrym);
+            transPrimitive.set(new Vector3f(trajectory.get(0).primitiveX ,floorHeight/2 + primitive.getRadius() + 0.01f,trajectory.get(0).primitiveZ ));
+            translatePrimitive.setTransform(transPrimitive);
             
-            if(trajektoria.get(0).catched && prym.getParent().equals(scena))
+            if(trajectory.get(0).catched && primitiveBranch.getParent().equals(stage))
             {
              isCatched = true;
            System.err.println("catched");
            
-           scena .removeChild(prym);
-           przesunKisc.addChild(prym);  
+           stage .removeChild(primitiveBranch);
+           translateWrist.addChild(primitiveBranch);  
            
-           transPrym.set(new Vector3f(prymityw.getRadius(),0.0f,0.0f));
-           przesunPrym.setTransform(transPrym);   
+           transPrimitive.set(new Vector3f(primitive.getRadius(),0.0f,0.0f));
+           translatePrimitive.setTransform(transPrimitive);   
          
            }
-            else if (!trajektoria.get(0).catched && prym.getParent().equals(przesunKisc))
+            else if (!trajectory.get(0).catched && primitiveBranch.getParent().equals(translateWrist))
             {
                 isCatched = false;
-            przesunKisc.removeChild(prym);
-            scena.addChild(prym);
+            translateWrist.removeChild(primitiveBranch);
+            stage.addChild(primitiveBranch);
          
-               transPrym.set(new Vector3f(trajektoria.get(0).prymX ,groundHeight/2 + prymityw.getRadius() + 0.01f,trajektoria.get(0).prymZ ));
+               transPrimitive.set(new Vector3f(trajectory.get(0).primitiveX ,floorHeight/2 + primitive.getRadius() + 0.01f,trajectory.get(0).primitiveZ ));
                 
             }
-            else if(trajektoria.get(0).catched && prym.getParent().equals(przesunKisc))
+            else if(trajectory.get(0).catched && primitiveBranch.getParent().equals(translateWrist))
             {
-                transPrym.set(new Vector3f(prymityw.getRadius(),0.0f,0.0f));
-                przesunPrym.setTransform(transPrym);   
+                transPrimitive.set(new Vector3f(primitive.getRadius(),0.0f,0.0f));
+                translatePrimitive.setTransform(transPrimitive);   
             }
             
             isRecorded = true;
          }
              
                     for(int i = 0 ; i<8 ; i++)
-                 przyciski[i] = trajektoria.get(index).przyciski[i];
+                 button[i] = trajectory.get(index).buttons[i];
             
            
              

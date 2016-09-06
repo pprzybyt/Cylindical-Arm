@@ -7,32 +7,32 @@ import static robot2.Robot2.*;
  * Trajectory that Robot will follow automatically
  * @author PrzemysławPrzybyt
  */
-public class Trajektoria {
+public class Trajectory {
     
-    public boolean [] przyciski;
+    public boolean [] buttons;
     public static int ID;
     public float height;
     public double yAngle;
     public float armRadius;
     
-    public float prymX;
-    public float prymZ;
+    public float primitiveX;
+    public float primitiveZ;
     
     public boolean catched;
     /**
      * Creates new trajectory that Robot will follow automatically
      */
-    public Trajektoria()
+    public Trajectory()
     {
-        this.przyciski = new boolean[8];
+        this.buttons = new boolean[8];
         ID++;
         if(ID==1)
         {
-            this.height = pierscien.getYPos();
-            this.yAngle = pierscien.getYAngle();
-            this.armRadius = ramie.getXPos();
-            this.prymX = prymXPos;
-            this.prymZ = prymZPos;
+            this.height = ring.getYPos();
+            this.yAngle = ring.getYAngle();
+            this.armRadius = arm.getXPos();
+            this.primitiveX = primitiveXPos;
+            this.primitiveZ = primitiveZPos;
             this.catched = isCatched;
         } 
 
@@ -41,10 +41,10 @@ public class Trajektoria {
      * Chooses which part of robot must be moved to follow specified trajectory
      * @param x this parameter specifies which "virtual" button must be clicked to create desired move of robot
      */
-    public void ustawRuch(int x)
+    public void SetMovement(int x)
     {
         if(x<8)
-            this.przyciski[x]=true;
+            this.buttons[x]=true;
     }
     
 }

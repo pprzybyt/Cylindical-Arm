@@ -38,7 +38,7 @@ import javax.vecmath.Matrix3f;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
-import static robot2.Robot2.przyciski;
+import static robot2.Robot2.button;
 
 /**
  * Main class, Creates main BranchGroup and initiates all components of scene
@@ -48,55 +48,55 @@ import static robot2.Robot2.przyciski;
 public class Robot2 extends JFrame implements ActionListener, KeyListener{
 
     
-    public static BranchGroup scena;
+    public static BranchGroup stage;
   
     
     // up, down, left, roght, long, short, take, put
-    public static boolean [] przyciski = new boolean[10];
+    public static boolean [] button = new boolean[10];
     
-    private Cylinder podloga;
-    private Cylinder trzon;
-    public static MyBox pierscien;
-    public static MyCylinder ramie;
-    public static MyCylinder kisc;
+    private Cylinder floor;
+    private Cylinder core;
+    public static MyBox ring;
+    public static MyCylinder arm;
+    public static MyCylinder wrist;
     
-    public static MySphere prymityw;
+    public static MySphere primitive;
     
-    private TransformGroup glownaTrans;
+    private TransformGroup mainTransform;
     
-    public static ArrayList <Trajektoria> trajektoria = new ArrayList<>() ;
+    public static ArrayList <Trajectory> trajectory = new ArrayList<>() ;
     public static int index = 0;
     public static float robotHeight = 0.8f;
     public static float robotRadius = 0.08f;
-    public static float groundHeight = 0.02f;
+    public static float floorHeight = 0.02f;
     
-    private final float pierscienLenght = 0.3f ;
-    private final float pierscienHeight = 0.1f;
-    private final float pierscienWidth = 0.1f;
+    private final float ringLenght = 0.3f ;
+    private final float ringHeight = 0.1f;
+    private final float ringWidth = 0.1f;
     
-    public static Transform3D transPierscien;
-    public static Transform3D rotPierscien;
+    public static Transform3D transRing;
+    public static Transform3D rotRing;
     
-    public static TransformGroup przesunPierscien;
-    public static TransformGroup obrotPierscien;
+    public static TransformGroup translateRing;
+    public static TransformGroup rotateRing;
     
-    public static TransformGroup przesunRamie;
-    public static Transform3D transRamie;
+    public static TransformGroup translateArm;
+    public static Transform3D transArm;
     
-    public static TransformGroup przesunKisc;
+    public static TransformGroup translateWrist;
     
-    public static TransformGroup przesunPrym;
-    public static TransformGroup obrotPrym;
+    public static TransformGroup translatePrimitive;
+    public static TransformGroup rotatePrimitive;
     
-    public static Transform3D rotPrym;
-    public static Transform3D transPrym;
+    public static Transform3D rotPrimitive;
+    public static Transform3D transPrimitive;
     
     public static boolean isCatched = false;
     
-    public static float prymHeight;
-    public static float prymXPos;
-    public static float prymZPos;
-     public static float prymRadius;
+    public static float primitiveHeight;
+    public static float primitiveXPos;
+    public static float primitiveZPos;
+     public static float primitiveRadius;
      
     public static boolean isFallingDown = false;
     
@@ -108,8 +108,8 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
     
     public static boolean allowCatch = false;
     
-    public static BranchGroup prym;
-    public static Sphere s;
+    public static BranchGroup primitiveBranch;
+    public static Sphere sphere;
     
     private final Timer timer;
     
@@ -155,31 +155,29 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
         setLocationRelativeTo(null);
         requestFocusInWindow();
 
-        scena = utworzScene();
+        stage = utworzScene();
         
-        scena.setCapability(BranchGroup.ALLOW_CHILDREN_EXTEND);
-        scena.setCapability(BranchGroup.ALLOW_CHILDREN_READ);
-        scena.setCapability(BranchGroup.ALLOW_CHILDREN_WRITE);
+        stage.setCapability(BranchGroup.ALLOW_CHILDREN_EXTEND);
+        stage.setCapability(BranchGroup.ALLOW_CHILDREN_READ);
+        stage.setCapability(BranchGroup.ALLOW_CHILDREN_WRITE);
           
-        scena.setCapability(BranchGroup.ALLOW_COLLISION_BOUNDS_READ);
-        scena.setCapability(BranchGroup.ALLOW_COLLISION_BOUNDS_WRITE);
+        stage.setCapability(BranchGroup.ALLOW_COLLISION_BOUNDS_READ);
+        stage.setCapability(BranchGroup.ALLOW_COLLISION_BOUNDS_WRITE);
   
-	scena.compile();
+	stage.compile();
         
         SimpleUniverse simpleU = new SimpleUniverse(canvas3D);
 
         Transform3D przesuniecie_obserwatora = new Transform3D();
-        przesuniecie_obserwatora.set(new Vector3f(0.0f,(robotHeight+groundHeight)/2,3.5f));
+        przesuniecie_obserwatora.set(new Vector3f(0.0f,(robotHeight+floorHeight)/2,3.5f));
         simpleU.getViewingPlatform().getViewPlatformTransform().setTransform(przesuniecie_obserwatora);
-        simpleU.addBranchGraph(scena);
+        simpleU.addBranchGraph(stage);
         
-        // obrot kamery
         OrbitBehavior orbitBeh = new OrbitBehavior(canvas3D, OrbitBehavior.REVERSE_ROTATE);
         orbitBeh.setSchedulingBounds(new BoundingSphere());
         simpleU.getViewingPlatform().setViewPlatformBehavior(orbitBeh);
-              glownaTrans = simpleU.getViewingPlatform().getViewPlatformTransform();
+              mainTransform = simpleU.getViewingPlatform().getViewPlatformTransform();
   
-        // 40 razy na sekunde wykonuje to co w klasie zadanie
         timer = new Timer();
         timer.scheduleAtFixedRate(new Task(),0,25);
         
@@ -200,39 +198,39 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
      */
      private BranchGroup utworzScene() 
      {
-            BranchGroup Scena = new BranchGroup();
+            BranchGroup Stage = new BranchGroup();
             
             BoundingSphere bounds = new BoundingSphere();
             bounds.setRadius(1.5);
-            Lights(Scena,bounds);
+            Lights(Stage,bounds);
             
            
-        // PODŁOGA
+        //  FLOOR
          
-      Appearance aPodloga = new Appearance();
-      Material mPodloga = new Material();
+      Appearance aFloor = new Appearance();
+      Material mFloor = new Material();
       
-      Texture2D tPodloga = TextureMaker("pafcy.jpg");
+      Texture2D tFloor = TextureMaker("pafcy.jpg");
       
-      aPodloga.setMaterial(mPodloga);
-      aPodloga.setTexture(tPodloga);
+      aFloor.setMaterial(mFloor);
+      aFloor.setTexture(tFloor);
       
-      podloga = new Cylinder(1.2f, groundHeight,Cylinder.GENERATE_NORMALS | Cylinder.GENERATE_TEXTURE_COORDS,aPodloga);
+      floor = new Cylinder(1.2f, floorHeight,Cylinder.GENERATE_NORMALS | Cylinder.GENERATE_TEXTURE_COORDS,aFloor);
       
-      glownaTrans = new TransformGroup();
-      AllowBlock(glownaTrans, true);
-      glownaTrans.addChild(podloga);
+      mainTransform = new TransformGroup();
+      AllowBlock(mainTransform, true);
+      mainTransform.addChild(floor);
       
-      //   TRZON
+      //   CORE
       
-      Appearance aRamie = new Appearance();
-      Material mRamie = new Material();
+      Appearance aArm = new Appearance();
+      Material mArm = new Material();
       
       
-      Texture2D tRamie = TextureMaker("robot4.jpg");
+      Texture2D tArm = TextureMaker("robot4.jpg");
       
-       aRamie.setMaterial(mRamie);
-      aRamie.setTexture(tRamie);
+      aArm.setMaterial(mArm);
+      aArm.setTexture(tArm);
       
       
       Appearance aRobot = new Appearance();
@@ -244,130 +242,129 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
       aRobot.setMaterial(mRobot);
       aRobot.setTexture(tRobot);
       
-      trzon = new Cylinder(robotRadius, robotHeight,Cylinder.GENERATE_NORMALS | Cylinder.GENERATE_TEXTURE_COORDS,aRamie);
+      core = new Cylinder(robotRadius, robotHeight,Cylinder.GENERATE_NORMALS | Cylinder.GENERATE_TEXTURE_COORDS,aArm);
       
-      Transform3D transTrzon = new Transform3D();
-      transTrzon.set(new Vector3f(0.0f,(robotHeight+groundHeight)/2,0.0f));
+      Transform3D transCore = new Transform3D();
+      transCore.set(new Vector3f(0.0f,(robotHeight+floorHeight)/2,0.0f));
       
-      TransformGroup przesunTrzon = new TransformGroup(transTrzon);
-      przesunTrzon.addChild(trzon);
+      TransformGroup translateCore = new TransformGroup(transCore);
+      translateCore.addChild(core);
       
-      glownaTrans.addChild(przesunTrzon);
+      mainTransform.addChild(translateCore);
      
-    //  PODSTAWA
-       MyBox podstawa = new MyBox(0.3f,0.01f,0.3f,Box.GENERATE_NORMALS | Box.GENERATE_TEXTURE_COORDS,aRobot);
-       Transform3D transPodst = new Transform3D();
-       transPodst.set(new Vector3f(0.0f,groundHeight,0.0f));
-       TransformGroup przesunPodst = new TransformGroup(transPodst);
-       przesunPodst.addChild(podstawa);
-       glownaTrans.addChild(przesunPodst);
+    //  BASE
+    
+       MyBox base = new MyBox(0.3f,0.01f,0.3f,Box.GENERATE_NORMALS | Box.GENERATE_TEXTURE_COORDS,aRobot);
+       Transform3D transBase = new Transform3D();
+       transBase.set(new Vector3f(0.0f,floorHeight,0.0f));
+       TransformGroup translateBase = new TransformGroup(transBase);
+       translateBase.addChild(base);
+       mainTransform.addChild(translateBase);
        
      
-    //   PIERSCIEN
+    //   RING
     
-      pierscien = new MyBox (pierscienLenght, pierscienHeight, pierscienWidth,Box.GENERATE_NORMALS | Box.GENERATE_TEXTURE_COORDS,aRobot);
-      transPierscien = new Transform3D();
-      transPierscien.set(new Vector3f(pierscien.getLenght()/2,0.0f,0.0f));
-      pierscien.setXPos(pierscien.getLenght()/2);
-      przesunPierscien = new TransformGroup(transPierscien);
-         AllowBlock(przesunPierscien, true);
-      przesunPierscien.addChild(pierscien);
+      ring = new MyBox (ringLenght, ringHeight, ringWidth,Box.GENERATE_NORMALS | Box.GENERATE_TEXTURE_COORDS,aRobot);
+      transRing = new Transform3D();
+      transRing.set(new Vector3f(ring.getLenght()/2,0.0f,0.0f));
+      ring.setXPos(ring.getLenght()/2);
+      translateRing = new TransformGroup(transRing);
+         AllowBlock(translateRing, true);
+      translateRing.addChild(ring);
       
       
-      rotPierscien = new Transform3D();
-      obrotPierscien = new TransformGroup(rotPierscien);
-         AllowBlock(obrotPierscien, true);
-      obrotPierscien.addChild(przesunPierscien);
+      rotRing = new Transform3D();
+      rotateRing = new TransformGroup(rotRing);
+         AllowBlock(rotateRing, true);
+      rotateRing.addChild(translateRing);
       
-      przesunTrzon.addChild(obrotPierscien);
+      translateCore.addChild(rotateRing);
       
-      //  RAMIE
+      //  ARM
       
-
-      ramie = new MyCylinder(0.07f, pierscien.getLenght()*2 - robotRadius*2 - 0.05f,Cylinder.GENERATE_NORMALS | Cylinder.GENERATE_TEXTURE_COORDS,aRamie);
+      arm = new MyCylinder(0.07f, ring.getLenght()*2 - robotRadius*2 - 0.05f,Cylinder.GENERATE_NORMALS | Cylinder.GENERATE_TEXTURE_COORDS,aArm);
       
-      Transform3D tempRot = new Transform3D();
-      tempRot.rotZ((double)Math.PI/2);
+      Transform3D rotTemplate = new Transform3D();
+      rotTemplate.rotZ((double)Math.PI/2);
       
-      Transform3D poczRot = new Transform3D();
-      poczRot.mul(tempRot);
+      Transform3D rot = new Transform3D();
+      rot.mul(rotTemplate);
       
-      TransformGroup obrotPocz = new TransformGroup(poczRot);
-      obrotPocz.addChild(ramie);
+      TransformGroup rotation1 = new TransformGroup(rot);
+      rotation1.addChild(arm);
       
-      transRamie = new Transform3D();
-      transRamie.set(new Vector3f(pierscien.getXPos(),0.0f,0.0f));
+      transArm = new Transform3D();
+      transArm.set(new Vector3f(ring.getXPos(),0.0f,0.0f));
       
-      ramie.setXPos(pierscien.getXPos());
+      arm.setXPos(ring.getXPos());
       
-      przesunRamie = new TransformGroup(transRamie);
-         AllowBlock(przesunRamie, true);
-      przesunRamie.addChild(obrotPocz);
+      translateArm = new TransformGroup(transArm);
+         AllowBlock(translateArm, true);
+      translateArm.addChild(rotation1);
       
-      przesunPierscien.addChild(przesunRamie);
+      translateRing.addChild(translateArm);
       
-      //   KISC
+      //   WRIST
       
-      kisc = new MyCylinder(0.1f, 0.01f,Cylinder.GENERATE_NORMALS | Cylinder.GENERATE_TEXTURE_COORDS,aRobot);
+      wrist = new MyCylinder(0.1f, 0.01f,Cylinder.GENERATE_NORMALS | Cylinder.GENERATE_TEXTURE_COORDS,aRobot);
         
-      TransformGroup obrotPocz2 = new TransformGroup(poczRot);
-      obrotPocz2.addChild(kisc);
+      TransformGroup rotation2 = new TransformGroup(rot);
+      rotation2.addChild(wrist);
       
-      Transform3D transKisc = new Transform3D();
-      transKisc.set(new Vector3f(ramie.getHeight()/2,0.0f,0.0f));
+      Transform3D transWrist = new Transform3D();
+      transWrist.set(new Vector3f(arm.getHeight()/2,0.0f,0.0f));
       
-      przesunKisc = new TransformGroup(transKisc);
-         AllowBlock(przesunKisc, true);
-      przesunKisc.addChild(obrotPocz2);
+      translateWrist = new TransformGroup(transWrist);
+         AllowBlock(translateWrist, true);
+      translateWrist.addChild(rotation2);
       
-      przesunRamie.addChild(przesunKisc);
+      translateArm.addChild(translateWrist);
   
       // PRYMITYW
       
-      Appearance aPilka = new Appearance();
-      Material mPilka = new Material();
+      Appearance aBall = new Appearance();
+      Material mBall = new Material();
       
-      Texture2D tPilka = TextureMaker("pilka.jpg");
+      Texture2D tBall = TextureMaker("pilka.jpg");
       
-      aPilka.setMaterial(mPilka);
-      aPilka.setTexture(tPilka);
+      aBall.setMaterial(mBall);
+      aBall.setTexture(tBall);
       
-      prymityw =  new MySphere(0.1f,Sphere.GENERATE_TEXTURE_COORDS|Sphere.GENERATE_NORMALS ,aPilka);
+      primitive =  new MySphere(0.1f,Sphere.GENERATE_TEXTURE_COORDS|Sphere.GENERATE_NORMALS ,aBall);
       
       
-      transPrym = new Transform3D();
+      transPrimitive = new Transform3D();
          
-      transPrym.set(new Vector3f(pierscien.getLenght() + 0.3f ,prymityw.getRadius() + groundHeight/2 + 0.01f,0.0f));
+      transPrimitive.set(new Vector3f(ring.getLenght() + 0.3f ,primitive.getRadius() + floorHeight/2 + 0.01f,0.0f));
       
-      prymXPos = pierscien.getLenght() + 0.3f;
-      // po to by nie mozna było lapac kiscia ktora jest za prymitywem
-      prymRadius = pierscien.getLenght() + 0.3f;
+      primitiveXPos = ring.getLenght() + 0.3f;
+      primitiveRadius = ring.getLenght() + 0.3f;
 
-      przesunPrym = new TransformGroup(transPrym);
-           AllowBlock(przesunPrym, true);    
-      przesunPrym.addChild(prymityw);
+      translatePrimitive = new TransformGroup(transPrimitive);
+           AllowBlock(translatePrimitive, true);    
+      translatePrimitive.addChild(primitive);
       
-       prym = new BranchGroup();
+       primitiveBranch = new BranchGroup();
        
-       prym.setCapability(BranchGroup.ALLOW_DETACH);
-       prym.setCapability(BranchGroup.ALLOW_CHILDREN_READ);
-       prym.setCapability(BranchGroup.ALLOW_CHILDREN_WRITE);
+       primitiveBranch.setCapability(BranchGroup.ALLOW_DETACH);
+       primitiveBranch.setCapability(BranchGroup.ALLOW_CHILDREN_READ);
+       primitiveBranch.setCapability(BranchGroup.ALLOW_CHILDREN_WRITE);
        
-       prym.addChild(przesunPrym);
+       primitiveBranch.addChild(translatePrimitive);
        
                                 
        // kolizja
-        CollisionDetector cd = new CollisionDetector(prymityw);
+        CollisionDetector cd = new CollisionDetector(primitive);
         cd.setSchedulingBounds(bounds);
         
       
      
-        Scena.addChild(glownaTrans);
-        Scena.addChild(prym);
+        Stage.addChild(mainTransform);
+        Stage.addChild(primitiveBranch);
 
-        glownaTrans.addChild(cd);
+        mainTransform.addChild(cd);
   
-            return Scena;
+            return Stage;
             
      }
      
@@ -421,7 +418,7 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
     {
         if(e.getSource()==start)
         {
-             przyciski[8] = true;
+             button[8] = true;
 
              isRecorded = true;
 
@@ -433,9 +430,9 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
         {
             if(isRecorded)
             {
-            przyciski[8] = false;
+            button[8] = false;
             index = 0 ;
-            przyciski[9] = true;
+            button[9] = true;
 
             }
 
@@ -468,16 +465,16 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
         
         switch(e.getKeyCode())
         {
-            case KeyEvent.VK_UP : przyciski[0] = true; break;
-            case KeyEvent.VK_DOWN : przyciski[1] = true; break;
-            case KeyEvent.VK_LEFT : przyciski[2] = true; break;
-            case KeyEvent.VK_RIGHT : przyciski[3] = true; break;
-            case KeyEvent.VK_Z : przyciski[4] = true; break;       // wsuwanie
-            case KeyEvent.VK_X : przyciski[5] = true; break;   // wysuwanie
-            case KeyEvent.VK_C : przyciski[6] = true; break;        // lapanie
-            case KeyEvent.VK_SPACE : przyciski[7] = true; break;  // puszczanie
-            case KeyEvent.VK_S : przyciski[8] = true; break;   // start
-            case KeyEvent.VK_Q : if(isRecorded) przyciski[8] = false ; break;   // stop
+            case KeyEvent.VK_UP : button[0] = true; break;
+            case KeyEvent.VK_DOWN : button[1] = true; break;
+            case KeyEvent.VK_LEFT : button[2] = true; break;
+            case KeyEvent.VK_RIGHT : button[3] = true; break;
+            case KeyEvent.VK_Z : button[4] = true; break;       // slipping in
+            case KeyEvent.VK_X : button[5] = true; break;   // ejecting
+            case KeyEvent.VK_C : button[6] = true; break;        // catching
+            case KeyEvent.VK_SPACE : button[7] = true; break;  // releasing
+            case KeyEvent.VK_S : button[8] = true; break;   // start
+            case KeyEvent.VK_Q : if(isRecorded) button[8] = false ; break;   // stop
             case KeyEvent.VK_W : RobotReset(); break;     // reset
         }
         
@@ -491,15 +488,15 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
     public void keyReleased(KeyEvent e) {
       switch(e.getKeyCode())
         {
-            case KeyEvent.VK_UP : przyciski[0] = false; break;
-            case KeyEvent.VK_DOWN : przyciski[1] = false; break;
-            case KeyEvent.VK_LEFT : przyciski[2] = false; break;
-            case KeyEvent.VK_RIGHT : przyciski[3] = false; break;
-            case KeyEvent.VK_Z : przyciski[4] = false; break;
-            case KeyEvent.VK_X : przyciski[5] = false; break;
-            case KeyEvent.VK_C : przyciski[6] = false; break; 
-            case KeyEvent.VK_SPACE : przyciski[7] = false; break;  
-            case KeyEvent.VK_Q :  index = 0 ; przyciski[9] = true; break;  
+            case KeyEvent.VK_UP : button[0] = false; break;
+            case KeyEvent.VK_DOWN : button[1] = false; break;
+            case KeyEvent.VK_LEFT : button[2] = false; break;
+            case KeyEvent.VK_RIGHT : button[3] = false; break;
+            case KeyEvent.VK_Z : button[4] = false; break;
+            case KeyEvent.VK_X : button[5] = false; break;
+            case KeyEvent.VK_C : button[6] = false; break; 
+            case KeyEvent.VK_SPACE : button[7] = false; break;  
+            case KeyEvent.VK_Q :  index = 0 ; button[9] = true; break;  
         }
     }
     
@@ -510,11 +507,11 @@ public class Robot2 extends JFrame implements ActionListener, KeyListener{
     public void RobotReset()
     {
         isRecorded = false;
-        przyciski[9] = false; 
-        trajektoria.removeAll(trajektoria);
-        Trajektoria.ID = 0;
+        button[9] = false; 
+        trajectory.removeAll(trajectory);
+        Trajectory.ID = 0;
         index = 0 ;
-        for(int i = 0; i< przyciski.length ; i++)
-            przyciski[i] = false;
+        for(int i = 0; i< button.length ; i++)
+            button[i] = false;
     }
 }
