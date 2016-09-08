@@ -16,14 +16,12 @@ We can change the view on the arm by pressing and moving mouse and also move clo
 - C - catching primitive
 - SPACE - releasing primitive
 
-
 <br>
 Language: JAVA/JAVA3D
 
 IDE: NetBeans 8.1 with Java3D libraries
 <br><br><br>
 If u have any questions please contact me on pprzybyt@gmail.com
-
 
 <p align="center">
   <img src="ROBO0.png" width="400"/>
