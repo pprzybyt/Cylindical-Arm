@@ -25,8 +25,8 @@ If u have any questions please contact me on pprzybyt@gmail.com
 
 
 <p align="center">
-  <img src="ROBO0.png" width="350"/>
-  <img src="ROBO1.png" width="350"/>
+  <img src="ROBO0.png" width="400"/>
+  <img src="ROBO1.png" width="400"/>
   <br>
-    <img src="ROBO2.png" width="350"/>
+    <img src="ROBO2.png" width="400"/>
 </p>
